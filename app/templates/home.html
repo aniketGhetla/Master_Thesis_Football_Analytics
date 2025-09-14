@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <h1>Welcome to Football Analytics</h1>
+  <p class="lead">
+    This project ingests raw Sportec tracking + event data and stores it in Postgres for analysis.
+  </p>
+  <a class="btn-cta" href="{{ url_for('upload.upload_form') }}">📂 Upload &amp; Ingest Match</a>
+</section>
+
+<section class="stats">
+  <h2>Database Status</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Wide Table Rows</div>
+      <div class="stat-value">{{ counts.wide_rows or counts.wide or 0 }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Event Table Rows</div>
+      <div class="stat-value">{{ counts.event or 0 }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Merged Table Rows</div>
+      <div class="stat-value">{{ counts.merged or 0 }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Distinct Matches</div>
+      <div class="stat-value">{{ counts.matches or 0 }}</div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

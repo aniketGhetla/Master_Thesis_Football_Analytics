@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Football Analytics Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --bg:#0F1217; --panel:#151A21; --muted:#94A3B8; --text:#E5E7EB; --accent:#60A5FA; --line:#2a2f36; }
+    *{box-sizing:border-box}
+    body{margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
+    .container{max-width:1360px;margin:0 auto;padding:24px}
+    .header{display:flex;align-items:center;gap:10px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:12px;}
+    .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    h1{font-size:20px;margin:0}
+    .filters{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:16px;}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:11px;color:var(--muted)}
+    .field select,.field input{background:#0c0f14;border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px;outline:none;}
+    .btn{appearance:none;border:1px solid var(--line);background:#10151C;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr);}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;overflow:hidden}
+    .panel h2{font-size:18px;margin:0 0 8px 2px;display:flex;align-items:center;gap:8px;}
+    .sub{color:var(--muted);font-size:12px}
+    .span-12{grid-column:span 12}
+    .span-6{grid-column:span 6}
+    @media (max-width:1024px){.span-6{grid-column:span 12}}
+
+    /* badges for small stats */
+    .badges{display:flex;gap:8px;align-items:center;margin-left:auto}
+    .badge{font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:#0e131a;}
+    .badge.good{color:#22c55e;border-color:#134e27;background:rgba(34,197,94,0.08)}
+    .badge.bad{color:#ef4444;border-color:#6b1d1d;background:rgba(239,68,68,0.08)}
+
+    /* keep Plotly responsive */
+    .panel .plotly-graph-div, .panel .js-plotly-plot{
+      width:100% !important;
+      max-width:100% !important;
+    }
+
+    /* simple card for tactical section tables */
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--line);padding:8px 6px;font-size:13px}
+    th{color:var(--muted);text-align:left}
+    .alert{background:#0e131a;border:1px solid var(--line);padding:10px 12px;border-radius:10px;color:var(--muted)}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="logo-dot"></span>
+      <h1>Football Analytics Dashboard</h1>
+    </div>
+
+    <!-- Top filters -->
+    <form class="filters" method="get" action="">
+      <div class="field" style="grid-column: span 2;">
+        <label>Provider</label>
+        <select name="provider" disabled>
+          <option value="sportec" selected>sportec</option>
+        </select>
+        <input type="hidden" name="provider" value="sportec">
+      </div>
+
+      <div class="field" style="grid-column: span 2;">
+        <label>Our Side</label>
+        <select name="our_side" onchange="this.form.submit()">
+          <option value="home" {{ 'selected' if our_side=='home' else '' }}>home</option>
+          <option value="away" {{ 'selected' if our_side=='away' else '' }}>away</option>
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: span 2;">
+        <label>Strategy</label>
+        <select name="strategy" onchange="this.form.submit()">
+          {% for opt in strategy_options %}
+            <option value="{{ opt }}" {{ 'selected' if strategy == opt else '' }}>{{ opt }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: span 3;">
+        <label>Team (for pass network)</label>
+        <select name="team_id" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not team_id }}>All teams</option>
+          {% for tid in team_options %}
+            <option value="{{ tid }}" {{ 'selected' if team_id == tid else '' }}>{{ tid }}</option>
+          {% endfor %}
+        </select>
+        {% if team_name %}
+          <span class="sub">Selected: <strong>{{ team_name }}</strong>{% if opponent_name %} vs <strong>{{ opponent_name }}</strong>{% endif %}</span>
+        {% endif %}
+      </div>
+
+      <div class="field" style="grid-column: span 3;">
+        <label>Opponent Formation (for KG panel)</label>
+        <select name="opp_form" onchange="this.form.submit()">
+          {% if opp_form_options %}
+            {% for f in opp_form_options %}
+              <option value="{{ f }}" {{ 'selected' if opp_form == f else '' }}>{{ f }}</option>
+            {% endfor %}
+          {% else %}
+            <option value="" selected>—</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: span 3;">
+        <label>Opponent Phase (for KG panel)</label>
+        <select name="opp_phase" onchange="this.form.submit()">
+          {% for ph in phase_options %}
+            <option value="{{ ph }}" {{ 'selected' if opp_phase == ph else '' }}>{{ ph }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: span 2; align-self:end;">
+        <button class="btn" type="submit">Update</button>
+      </div>
+    </form>
+
+    <!-- Row 1: Pass map + Pass network -->
+    <div class="grid">
+      <div class="panel span-6">
+        <h2>
+          {{ team_name if team_name else (team_id if team_id else 'All teams') }} — Pass Map
+          <span class="badges">
+            <span class="badge good">Successful: {{ pass_ok }}</span>
+            <span class="badge bad">Unsuccessful: {{ pass_fail }}</span>
+            <span class="badge">Total: {{ pass_total }}</span>
+          </span>
+        </h2>
+        {% if opponent_name %}
+          <div class="sub" style="margin:2px 2px 8px;">vs {{ opponent_name }}</div>
+        {% endif %}
+
+        <!-- pass map local filters -->
+        <form method="get" action="" style="display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:8px;">
+          <input type="hidden" name="provider" value="{{ provider }}">
+          <input type="hidden" name="our_side" value="{{ our_side }}">
+          <input type="hidden" name="strategy" value="{{ strategy }}">
+          <input type="hidden" name="team_id" value="{{ team_id }}">
+          <input type="hidden" name="opp_form" value="{{ opp_form }}">
+          <input type="hidden" name="opp_phase" value="{{ opp_phase }}">
+          <input type="hidden" name="min_edge" value="{{ min_edge }}">
+          <input type="hidden" name="bins_x" value="{{ bins_x }}">
+          <input type="hidden" name="bins_y" value="{{ bins_y }}">
+          <input type="hidden" name="show_cents" value="{{ show_cents }}">
+          <input type="hidden" name="blob_scale" value="{{ blob_scale }}">
+          <input type="hidden" name="blob_labels" value="{{ blob_labels }}">
+          <input type="hidden" name="blob_dots" value="{{ blob_dots }}">
+          <input type="hidden" name="press_bins_x" value="{{ press_bins_x }}">
+          <input type="hidden" name="press_bins_y" value="{{ press_bins_y }}">
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Which passes?</label>
+            <select name="pass_which" onchange="this.form.submit()">
+              <option value="both" {{ 'selected' if pass_which=='both' else '' }}>Both</option>
+              <option value="successful" {{ 'selected' if pass_which=='successful' else '' }}>Successful only</option>
+              <option value="unsuccessful" {{ 'selected' if pass_which=='unsuccessful' else '' }}>Unsuccessful only</option>
+            </select>
+          </div>
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Originating half</label>
+            <select name="pass_half" onchange="this.form.submit()">
+              <option value="both" {{ 'selected' if pass_half=='both' else '' }}>Both halves</option>
+              <option value="def" {{ 'selected' if pass_half=='def' else '' }}>Defensive half</option>
+              <option value="att" {{ 'selected' if pass_half=='att' else '' }}>Attacking half</option>
+            </select>
+          </div>
+        </form>
+
+        {% if passes_html %}
+          {{ passes_html|safe }}
+        {% else %}
+          <div class="sub">No pass data available.</div>
+        {% endif %}
+      </div>
+
+      <div class="panel span-6">
+        <h2>{{ team_name if team_name else (team_id if team_id else 'All teams') }} — Pass Network</h2>
+
+        <form method="get" action="" style="display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:8px;">
+          <input type="hidden" name="provider" value="{{ provider }}">
+          <input type="hidden" name="our_side" value="{{ our_side }}">
+          <input type="hidden" name="strategy" value="{{ strategy }}">
+          <input type="hidden" name="team_id" value="{{ team_id }}">
+          <input type="hidden" name="opp_form" value="{{ opp_form }}">
+          <input type="hidden" name="opp_phase" value="{{ opp_phase }}">
+          <input type="hidden" name="pass_which" value="{{ pass_which }}">
+          <input type="hidden" name="pass_half" value="{{ pass_half }}">
+          <input type="hidden" name="bins_x" value="{{ bins_x }}">
+          <input type="hidden" name="bins_y" value="{{ bins_y }}">
+          <input type="hidden" name="show_cents" value="{{ show_cents }}">
+          <input type="hidden" name="blob_scale" value="{{ blob_scale }}">
+          <input type="hidden" name="blob_labels" value="{{ blob_labels }}">
+          <input type="hidden" name="blob_dots" value="{{ blob_dots }}">
+          <input type="hidden" name="press_bins_x" value="{{ press_bins_x }}">
+          <input type="hidden" name="press_bins_y" value="{{ press_bins_y }}">
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Min pass count for edge</label>
+            <select name="min_edge" onchange="this.form.submit()">
+              {% for v in [1,2,3,4,5,7,10] %}
+                <option value="{{ v }}" {{ 'selected' if min_edge==v else '' }}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+
+        {% if net_html %}
+          {{ net_html|safe }}
+        {% else %}
+          <div class="sub">No pass network available.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Row 2: Shots + Avg player positions heatmap -->
+    <div class="grid" style="margin-top:16px;">
+      <div class="panel span-6">
+        <h2>{{ team_name if team_name else (team_id if team_id else 'All teams') }} — Shot Map</h2>
+        {% if shots_html %}
+          {{ shots_html|safe }}
+          <div class="sub" style="text-align:center;margin-top:6px;">
+            <span style="color:#22c55e;">Goals ({{ goals }})</span>
+            &nbsp;&nbsp;
+            <span style="color:#ef4444;">Other shots ({{ others }})</span>
+          </div>
+        {% else %}
+          <div class="sub">No shots found.</div>
+        {% endif %}
+      </div>
+
+      <div class="panel span-6">
+        <h2>Average Player Positions — {{ team_name if team_name else (team_id if team_id else 'All teams') }}</h2>
+
+        <form method="get" action="" style="display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:8px;">
+          <input type="hidden" name="provider"  value="{{ provider }}">
+          <input type="hidden" name="our_side"  value="{{ our_side }}">
+          <input type="hidden" name="strategy"  value="{{ strategy }}">
+          <input type="hidden" name="team_id"   value="{{ team_id }}">
+          <input type="hidden" name="opp_form"  value="{{ opp_form }}">
+          <input type="hidden" name="opp_phase" value="{{ opp_phase }}">
+          <input type="hidden" name="min_edge"  value="{{ min_edge }}">
+          <input type="hidden" name="pass_which" value="{{ pass_which }}">
+          <input type="hidden" name="pass_half"  value="{{ pass_half }}">
+          <input type="hidden" name="blob_scale" value="{{ blob_scale }}">
+          <input type="hidden" name="blob_labels" value="{{ blob_labels }}">
+          <input type="hidden" name="blob_dots"   value="{{ blob_dots }}">
+          <input type="hidden" name="press_bins_x" value="{{ press_bins_x }}">
+          <input type="hidden" name="press_bins_y" value="{{ press_bins_y }}">
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Bins (X)</label>
+            <input type="range" name="bins_x" min="10" max="60" step="2" value="{{ bins_x }}"
+                   oninput="this.nextElementSibling.value=this.value" onchange="this.form.submit()">
+            <output style="margin-left:8px">{{ bins_x }}</output>
+          </div>
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Bins (Y)</label>
+            <input type="range" name="bins_y" min="6" max="40" step="2" value="{{ bins_y }}"
+                   oninput="this.nextElementSibling.value=this.value" onchange="this.form.submit()">
+            <output style="margin-left:8px">{{ bins_y }}</output>
+          </div>
+
+          <div class="field" style="grid-column: span 12;">
+            <label>
+              <input type="checkbox" name="show_cents" value="1" {{ 'checked' if show_cents==1 else '' }}
+                     onchange="this.form.submit()"> Show player centroids &amp; spread
+            </label>
+          </div>
+        </form>
+
+        {% if avgpos_html %}
+          {{ avgpos_html|safe }}
+        {% else %}
+          <div class="sub">No data available for heatmap.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Row 3: Avg team position (blobs) + Pressing heatmap -->
+    <div class="grid" style="margin-top:16px;">
+      <div class="panel span-6">
+        <h2>Avg Team Position — {{ team_name if team_name else (team_id if team_id else 'All teams') }}</h2>
+
+        <form method="get" action="" style="display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:8px;">
+          <input type="hidden" name="provider"  value="{{ provider }}">
+          <input type="hidden" name="our_side"  value="{{ our_side }}">
+          <input type="hidden" name="strategy"  value="{{ strategy }}">
+          <input type="hidden" name="team_id"   value="{{ team_id }}">
+          <input type="hidden" name="opp_form"  value="{{ opp_form }}">
+          <input type="hidden" name="opp_phase" value="{{ opp_phase }}">
+          <input type="hidden" name="min_edge"  value="{{ min_edge }}">
+          <input type="hidden" name="pass_which" value="{{ pass_which }}">
+          <input type="hidden" name="pass_half"  value="{{ pass_half }}">
+          <input type="hidden" name="bins_x" value="{{ bins_x }}">
+          <input type="hidden" name="bins_y" value="{{ bins_y }}">
+          <input type="hidden" name="show_cents" value="{{ show_cents }}">
+          <input type="hidden" name="press_bins_x" value="{{ press_bins_x }}">
+          <input type="hidden" name="press_bins_y" value="{{ press_bins_y }}">
+
+          <div class="field" style="grid-column: span 12;">
+            <label>Blob size</label>
+            <input type="range" name="blob_scale" min="1.0" max="3.0" step="0.05" value="{{ blob_scale }}"
+                   oninput="this.nextElementSibling.value=this.value" onchange="this.form.submit()">
+            <output style="margin-left:8px">{{ blob_scale }}</output>
+          </div>
+
+          <div class="field" style="grid-column: span 6;">
+            <label>
+              <input type="checkbox" name="blob_labels" value="1" {{ 'checked' if blob_labels==1 else '' }}
+                     onchange="this.form.submit()"> Show player labels
+            </label>
+          </div>
+
+          <div class="field" style="grid-column: span 6;">
+            <label>
+              <input type="checkbox" name="blob_dots" value="1" {{ 'checked' if blob_dots==1 else '' }}
+                     onchange="this.form.submit()"> Show center dots
+            </label>
+          </div>
+        </form>
+
+        {% if teampos_html %}
+          {{ teampos_html|safe }}
+        {% else %}
+          <div class="sub">No data available.</div>
+        {% endif %}
+      </div>
+
+      <div class="panel span-6">
+        <h2>Pressing Heatmap — {{ team_name if team_name else (team_id if team_id else 'All teams') }}</h2>
+
+        <form method="get" action="" style="display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:8px;">
+          <input type="hidden" name="provider"  value="{{ provider }}">
+          <input type="hidden" name="our_side"  value="{{ our_side }}">
+          <input type="hidden" name="strategy"  value="{{ strategy }}">
+          <input type="hidden" name="team_id"   value="{{ team_id }}">
+          <input type="hidden" name="opp_form"  value="{{ opp_form }}">
+          <input type="hidden" name="opp_phase" value="{{ opp_phase }}">
+          <input type="hidden" name="min_edge"  value="{{ min_edge }}">
+          <input type="hidden" name="pass_which" value="{{ pass_which }}">
+          <input type="hidden" name="pass_half"  value="{{ pass_half }}">
+          <input type="hidden" name="bins_x" value="{{ bins_x }}">
+          <input type="hidden" name="bins_y" value="{{ bins_y }}">
+          <input type="hidden" name="show_cents" value="{{ show_cents }}">
+          <input type="hidden" name="blob_scale" value="{{ blob_scale }}">
+          <input type="hidden" name="blob_labels" value="{{ blob_labels }}">
+          <input type="hidden" name="blob_dots"   value="{{ blob_dots }}">
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Bins X</label>
+            <input type="range" name="press_bins_x" min="10" max="60" step="2" value="{{ press_bins_x }}"
+                   oninput="this.nextElementSibling.value=this.value" onchange="this.form.submit()">
+            <output style="margin-left:8px">{{ press_bins_x }}</output>
+          </div>
+
+          <div class="field" style="grid-column: span 6;">
+            <label>Bins Y</label>
+            <input type="range" name="press_bins_y" min="6" max="40" step="2" value="{{ press_bins_y }}"
+                   oninput="this.nextElementSibling.value=this.value" onchange="this.form.submit()">
+            <output style="margin-left:8px">{{ press_bins_y }}</output>
+          </div>
+        </form>
+
+        {% if press_html %}
+          {{ press_html|safe }}
+        {% else %}
+          <div class="sub">No recoveries detected (press heatmap empty).</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Tactical Recommendation -->
+    <section class="panel" style="margin-top:16px;">
+      <h2>Tactical Recommendation</h2>
+
+      {% if not reco %}
+        <div class="alert">
+          No saved recommendations found for this provider/side.
+          Run your prediction script to populate <code>tactical_recommendations_new</code>.
+        </div>
+      {% else %}
+        <div class="grid" style="grid-template-columns: repeat(12, 1fr); gap: 16px;">
+          <div class="span-6">
+            <h3 style="margin:6px 0 8px;">Suggested Strategy</h3>
+            <p>{{ reco_text }}</p>
+            <p class="muted">
+              <strong>Recommended formation:</strong> {{ reco_form }}
+              &nbsp;•&nbsp; <strong>Confidence:</strong> {{ '%.2f'|format(reco_conf) }}
+              &nbsp;•&nbsp; <strong>Opponent:</strong> {{ opp_form }} in {{ opp_phase }}
+            </p>
+
+            <h4 style="margin:16px 0 8px;">Why? (evidence)</h4>
+
+            <h5 class="muted" style="margin:10px 0 6px;">Historical counters (KG)</h5>
+            {% if kg_prior_rows %}
+              <table>
+                <thead><tr><th>Candidate form</th><th>Provider</th><th>Phase</th><th>Support</th></tr></thead>
+                <tbody>
+                  {% for r in kg_prior_rows %}
+                    <tr>
+                      <td>{{ r.candidate_form }}</td>
+                      <td>{{ r.provider if r.provider else '-' }}</td>
+                      <td>{{ r.phase }}</td>
+                      <td>{{ '%.3f'|format(r.support) }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="muted">No KG prior evidence for this context.</p>
+            {% endif %}
+
+            {% if gnn_rows %}
+              <h5 class="muted" style="margin:12px 0 6px;">GNN probabilities</h5>
+              <table>
+                <thead><tr><th>Formation</th><th>Prob</th></tr></thead>
+                <tbody>
+                  {% for r in gnn_rows|sort(attribute='prob', reverse=True) %}
+                    <tr><td>{{ r.formation }}</td><td>{{ '%.3f'|format(r.prob) }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+
+            {% if fused_rows %}
+              <h5 class="muted" style="margin:12px 0 6px;">Fused ranking (GNN ⊕ prior)</h5>
+              <table>
+                <thead><tr><th>Formation</th><th>Score</th></tr></thead>
+                <tbody>
+                  {% for r in fused_rows %}
+                    <tr><td>{{ r.formation }}</td><td>{{ '%.3f'|format(r.score) }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% endif %}
+
+            {% if opp_tags or our_tags %}
+              <h5 class="muted" style="margin:12px 0 6px;">Detected style tags</h5>
+              {% if opp_tags %}<p><strong>Opponent:</strong> {{ opp_tags|join(', ') }}</p>{% endif %}
+              {% if our_tags %}<p><strong>Ours:</strong> {{ our_tags|join(', ') }}</p>{% endif %}
+            {% endif %}
+          </div>
+
+          <div class="span-6">
+            <h3 style="margin:6px 0 8px;">KG Analytics (counters for this opponent context)</h3>
+            {% if kg_fig_html %}
+              {{ kg_fig_html|safe }}
+            {% else %}
+              <div class="alert">No COUNTERS edges in KG for this formation/phase.</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+</body>
+</html>

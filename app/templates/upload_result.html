@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="ingest-result">
+
+  <!-- success banner -->
+  <div class="success-box">
+    <div class="icon">✅</div>
+    <div>
+      <h1 class="success-title">Ingestion Complete</h1>
+      <p class="success-sub">
+        Match <strong>{{ match_id }}</strong> was successfully ingested.
+      </p>
+    </div>
+  </div>
+
+  <!-- tables written -->
+  <div class="pill-wrap">
+    <span class="pill">sportec_databall_wide</span>
+    <span class="pill">sportec_event_new</span>
+    <span class="pill">sportec_databall_merged</span>
+  </div>
+
+  <!-- actions -->
+  <div class="actions">
+    <form action="{{ url_for('generate_dashboard') }}" method="post">
+      <button type="submit" class="btn btn-primary">⚙️ Generate Dashboard</button>
+    </form>
+
+    <a class="btn btn-outline" href="{{ url_for('home.index') }}">🏠 Back to Home</a>
+  </div>
+  
+
+</section>
+
+{% endblock %}

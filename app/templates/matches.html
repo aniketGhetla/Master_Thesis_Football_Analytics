@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <h2>Select a Match Run</h2>
+  <p>Pick a <code>unique_match_id</code> to generate the dashboard just for that run.</p>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Unique Match ID</th>
+        <th>Match</th>
+        <th>Date (first_ts)</th>
+        <th>Rows</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td><code>{{ r.unique_match_id }}</code></td>
+        <td>{{ r.home_team }} vs {{ r.away_team }}<br><small>{{ r.match_id }}</small></td>
+        <td>{{ r.first_ts or '-' }}</td>
+        <td>{{ r.rows }}</td>
+        <td>
+          <form action="{{ url_for('generate_dashboard') }}" method="post">
+            <input type="hidden" name="unique_match_id" value="{{ r.unique_match_id }}">
+            <button type="submit">Generate Dashboard</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

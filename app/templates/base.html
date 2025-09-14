@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Football Analytics</title>
+
+  <!-- Optional sporty display font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="theme-dark">
+  <!-- Top nav -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{{ url_for('home.index') }}">
+        <img src="{{ url_for('static', filename='img/soccor.png') }}" alt="Logo" />
+        <span>Football Analytics</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="{{ url_for('home.index') }}">Home</a>
+        <a href="{{ url_for('upload.upload_form') }}">Upload &amp; Ingest</a>
+        <a href="{{ url_for('about.about') }}">Info</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page content -->
+  <main class="container page-container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Football Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ Football Dashboard</h1>
+
+        {% if message %}
+            <p style="color: green;">{{ message }}</p>
+        {% endif %}
+
+        <hr>
+
+        <!-- Placeholder for actual dashboard -->
+        <h2>Coming Soon...</h2>
+        <p>Your data has been normalized and stored in the database. 
+        Next, we’ll query this data and generate charts here.</p>
+
+        <!-- Back to home button -->
+        <form action="{{ url_for('home.index') }}" method="get">
+            <button type="submit">⬅ Back to Home</button>
+        </form>
+    </div>
+</body>
+</html>

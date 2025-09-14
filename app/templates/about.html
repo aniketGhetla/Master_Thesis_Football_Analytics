@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="prose" style="max-width: 980px;">
+  <h2>Football Analytics System</h2>
+
+  <p>
+    Modern football increasingly demands tactical preparation and also pre-match and post-match evaluation grounded in
+    objective data rather than intuition alone. Traditional approaches, often relying on manual video review or basic
+    statistics, limit the ability of coaches and analysts to systematically study opponent behaviour and evaluate their
+    own team’s strategies. While recent advances in tracking and event data have enabled automated analyses of formations
+    and phases of play, most methods remain narrowly focused on expected goals (xG) and provide limited support for broader
+    tactical planning.
+  </p>
+
+  <p>
+    This thesis develops a football analytics system that assists teams in both pre-match preparation and post-match
+    analysis. The system ingests open, publicly available event and tracking datasets and processes them through sequential
+    layers: data injection, phase-of-play classification, formation detection, formation-vs-formation evaluation, tactical
+    recommendation, and visualization via a Flask-based dashboard.
+  </p>
+
+  <p>
+    Two novel contributions distinguish this work. First, the formation-vs-formation layer extends beyond xG by introducing
+    additional tactical metrics—ball possession percentage, ball recovery rate, and a composite measure of team strength—
+    yielding a more comprehensive assessment of how formations perform against one another. Second, the tactical
+    recommendation layer leverages Graph Neural Networks (GNNs) to model passing networks across phases of play and
+    integrates them with knowledge graphs to recommend counter-formations and strategies tailored to opponent tendencies.
+  </p>
+
+  <p>
+    All outputs are stored in a PostgreSQL database and presented through an interactive dashboard, allowing coaches and
+    analysts to explore tactical insights systematically. By combining contextualised multi-metric formation analysis with
+    AI-driven tactical recommendations, this thesis contributes a scalable framework for evidence-based preparation, enabling
+    football teams to better analyse opponents and refine their own strategies in both pre-match planning and post-match
+    review.
+  </p>
+
+  <hr>
+
+  <h3>Table of Contents (high-level)</h3>
+  <ul>
+    <li>Introduction</li>
+    <li>Background to the Study
+      <ul>
+        <li>Statement of Research Problem</li>
+        <li>Purpose of Study</li>
+        <li>Research Questions</li>
+      </ul>
+    </li>
+    <li>Theoretical Background
+      <ul>
+        <li>Football & Sport Analytics</li>
+        <li>Data Analytics in Football</li>
+        <li>Artificial Intelligence & Machine Learning</li>
+        <li>Deep Learning & Neural Networks (CNNs, GNNs)</li>
+        <li>Graph Representations in Football (Passing Networks)</li>
+        <li>Knowledge Graphs and Tactical Reasoning</li>
+      </ul>
+    </li>
+    <li>Football Performance Metrics
+      <ul>
+        <li>Expected Goals (xG), Expected Threat (xT)</li>
+        <li>Possession %, Ball Recovery Rate, PPDA, Pressing Metrics</li>
+        <li>Spacing (Width/Depth/Stretch), Team Strength</li>
+      </ul>
+    </li>
+    <li>Related Work</li>
+    <li>Dataset and Methodology
+      <ul>
+        <li>Datasets (Metrica, Sportec)</li>
+        <li>System Architecture & Data Ingestion</li>
+        <li>Preprocessing & Phase-of-Play Classification</li>
+        <li>Formation Detection</li>
+        <li>Formation-vs-Formation Evaluation</li>
+        <li>Tactical Recommendation Layer</li>
+      </ul>
+    </li>
+    <li>Implementation</li>
+    <li>Results & Evaluation</li>
+    <li>Conclusion & Future Scope</li>
+  </ul>
+
+  <hr>
+
+  <p>
+    For a live demonstration, see the dashboard pages (Pass Map, Pass Network, Shot Map, Pressing Heatmap, Formation-vs-Formation,
+    and Tactical Recommendation). The system stores intermediate results in PostgreSQL tables and renders them through the
+    Flask UI for interactive analysis.
+  </p>
+</section>
+
+<style>
+/* optional: nicer readable copy layout */
+.prose p { line-height: 1.7; color: var(--muted, #cbd5e1); }
+.prose h2, .prose h3 { margin-top: 8px; }
+.prose ul { margin-left: 1.25rem; }
+</style>
+{% endblock %}

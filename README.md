@@ -27,14 +27,22 @@ Data ingestion and synchronization are handled using:
 
 ---
 
-## 🏗️ System Architecture
 
+
+## 🧠 System Overview
+The complete pipeline from data ingestion to recommendation is shown below:
+
+![System Architecture](images/Aniket Ghetla Thesis architecture (1).png)
+
+
+## 🏗️ System Architecture
 ### 1. **Data Ingestion & Preprocessing**
 - Loaded and synchronized Sportec and Metrica tracking + event data using **DataBallPy** and **Kloppy**.  
 - Normalized coordinates, harmonized schemas, and computed **eligibility flags** to filter unstable phases (set pieces, transitions).  
 - Stored cleaned data in **PostgreSQL** for reproducibility.  
 
 **Tools:** `Python`, `DataBallPy`, `Kloppy`, `Pandas`, `PostgreSQL`
+
 
 ---
 

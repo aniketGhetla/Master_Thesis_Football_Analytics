@@ -110,6 +110,11 @@ The complete pipeline from data ingestion to dashboard is shown below:
 
 **Tools:** `Flask`, `Plotly`, `SQLAlchemy`, `HTML/CSS`, `Matplotlib`
 
+![Pass Map and Pass Network](Images/Pass_Map_Pass_Network.png)
+
+![Average Team Position](Images/Team_position.png)
+
+
 ---
 
 ### 7. **Evaluation**
@@ -120,5 +125,15 @@ The complete pipeline from data ingestion to dashboard is shown below:
 - Evaluation confirmed robust generalization and consistent tactical labeling.
 
 **Metrics:** Accuracy, Precision, Recall, F1-Score, Confusion Matrix Visualization
+
+<p align="center">
+  <img src="Images/Home_Validation.png" alt="Home phase validation" width="45%" />
+  <img src="Images/Away_Validation.png" alt="Away phase validation" width="45%" />
+</p>
+<p align="center">
+  <img src="Images/Home_test.png" alt="Home phase test" width="45%" />
+  <img src="images/Away_test.png.png" alt="Away phase test" width="45%" />
+</p>
+
 
 ---

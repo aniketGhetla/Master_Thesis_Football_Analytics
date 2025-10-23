@@ -154,7 +154,7 @@ The **ResNet-18–based phase classifier** achieved high accuracy across multipl
 The **GNN-based Tactical Recommender** built on these insights to propose interpretable, data-driven tactical adjustments.
 
 A key advancement of this work lies in the incorporation of a **Knowledge Graph (KG)** layer that models relationships between teams, formations, and tactical outcomes.  
-By linking graph-based reasoning with statistical evidence, the KG enables **explainable tactical recommendations**, showing *why* a specific counter-strategy is suggested—rather than treating the model as a black box.
+By linking graph-based reasoning with statistical evidence, the KG enables **explainable tactical recommendations**, showing *why* a specific counter-strategy is suggested rather than treating the model as a black box.
 
 Key contributions include:
 - A **unified data ingestion pipeline** for multi-provider football datasets.  

@@ -16,7 +16,7 @@ The goal of this project is to build a **data-driven tactical analysis system** 
 
 ## 🗂️ Dataset and Data Sources
 The project uses **multi-provider tracking, event and meta data** from:
-- **Sportec** and **Metrica Sports** datasets  
+- **Sportec** 7 matches and **Metrica Sports** 1 sample match datasets  
 - Tracking data (x, y coordinates of players and ball, 25Hz)
 - Event data (passes, shots, tackles, interceptions, etc.)
 - Meta data( stadium name, weather, stadium Id, etc)
@@ -110,5 +110,3 @@ Data ingestion and synchronization are handled using:
 **Metrics:** Accuracy, Precision, Recall, F1-Score, Confusion Matrix Visualization
 
 ---
-
-## 🧩 Project Structure

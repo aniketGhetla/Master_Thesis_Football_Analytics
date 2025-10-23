@@ -132,7 +132,7 @@ The complete pipeline from data ingestion to dashboard is shown below:
 </p>
 <p align="center">
   <img src="Images/Home_test.png" alt="Home phase test" width="45%" />
-  <img src="images/Away_test.png" alt="Away phase test" width="45%" />
+  <img src="Images/Away_test.png" alt="Away phase test" width="45%" />
 </p>
 
 

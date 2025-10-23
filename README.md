@@ -32,7 +32,8 @@ Data ingestion and synchronization are handled using:
 ## 🧠 System Overview
 The complete pipeline from data ingestion to recommendation is shown below:
 
-![System Architecture](Images/Aniket Ghetla Thesis architecture (1).png)
+![System Architecture](Images/architecture.png)
+
 
 
 

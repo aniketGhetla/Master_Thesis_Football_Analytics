@@ -117,12 +117,15 @@ The complete pipeline from data ingestion to dashboard is shown below:
 
 ---
 
-### 7. **Evaluation**
-- The **Phase Classifier** achieved:
-  - Validation Accuracy: **94.22% (Home)**, **98.67% (Away)**
-  - Test Accuracy: **93.33% (Home)**, **98.67% (Away)**
-- Strong F1-scores across all classes except minor confusion between *mid-block* and *high-block*.
-- Evaluation confirmed robust generalization and consistent tactical labeling.
+### **Evaluation**
+The system’s **phase classification models** (ResNet-18) were evaluated on both **home** and **away** teams using confusion matrices.  
+The results demonstrate strong performance, particularly for structured phases such as *build-up* and *mid-block*.
+
+**Observations**
+- The **Home Phase model** achieved **~93.3% accuracy**, showing high precision for *mid-block* and *attacking-play* phases.  
+- The **Away Phase model** achieved **~98.6% accuracy**, with excellent class separation and minimal cross-phase confusion.  
+- Minor overlap between *mid-block* and *low-block* reflects natural tactical fluidity.  
+- Overall, the model generalizes well across both teams, validating the CNN’s ability to capture spatial–temporal dynamics from tracking data.
 
 **Metrics:** Accuracy, Precision, Recall, F1-Score, Confusion Matrix Visualization
 
@@ -134,6 +137,33 @@ The complete pipeline from data ingestion to dashboard is shown below:
   <img src="Images/Home_test.png" alt="Home phase test" width="45%" />
   <img src="Images/Away_test.png" alt="Away phase test" width="45%" />
 </p>
+
+<p align="center">
+  <img src="Images/cm_home.png" alt="Home cm" width="45%" />
+  <img src="Images/cm_away.png" alt="Away cm" width="45%" />
+</p>
+
+These results confirm that the ResNet-18 based classifier effectively distinguishes tactical phases, providing a reliable foundation for downstream formation and GNN-based tactical recommendation layers.
+
+## 🏁 Conclusion
+
+This project presented an end-to-end **Deep Learning-based Formation Detection and GNN-driven Tactical Decision Support System** for football analytics.  
+By integrating tracking and event data across multiple providers (Sportec, PFF, and Metrica), the system enables automated tactical understanding at both the **phase** and **formation** levels.
+
+The **ResNet-18–based phase classifier** achieved high accuracy across multiple game states, while the **Formation vs Formation** analysis layer quantified tactical matchups using metrics such as xG, possession percentage, and ball recovery time.  
+The **GNN-based Tactical Recommender** built on these insights to propose interpretable, data-driven tactical adjustments.
+
+A key advancement of this work lies in the incorporation of a **Knowledge Graph (KG)** layer that models relationships between teams, formations, and tactical outcomes.  
+By linking graph-based reasoning with statistical evidence, the KG enables **explainable tactical recommendations**, showing *why* a specific counter-strategy is suggested—rather than treating the model as a black box.
+
+Key contributions include:
+- A **unified data ingestion pipeline** for multi-provider football datasets.  
+- A **CNN-based classifier** for recognizing phases of play with high generalization.  
+- A **Formation vs Formation layer** quantifying contextual team interactions.  
+- A **GNN + Knowledge Graph–driven recommender system** providing explainable tactical insights.  
+- A **visual analytics dashboard** integrating all layers for real-world usability.
+
+Overall, this system demonstrates how deep learning, graph reasoning, and structured knowledge representation can bridge the gap between **raw tracking data and tactical intelligence**, advancing the field of modern football analytics toward **interpretable AI-assisted coaching**.
 
 
 ---

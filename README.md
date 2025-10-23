@@ -127,12 +127,12 @@ The complete pipeline from data ingestion to dashboard is shown below:
 **Metrics:** Accuracy, Precision, Recall, F1-Score, Confusion Matrix Visualization
 
 <p align="center">
-  <img src="Images/Home_Validation.png" alt="Home phase validation" width="45%" />
-  <img src="Images/Away_Validation.png" alt="Away phase validation" width="45%" />
+  <img src="Images/Home_validation.png" alt="Home phase validation" width="45%" />
+  <img src="Images/Away_validation.png" alt="Away phase validation" width="45%" />
 </p>
 <p align="center">
   <img src="Images/Home_test.png" alt="Home phase test" width="45%" />
-  <img src="images/Away_test.png.png" alt="Away phase test" width="45%" />
+  <img src="images/Away_test.png" alt="Away phase test" width="45%" />
 </p>
 
 

@@ -1,7 +1,7 @@
 # ⚽ Deep Learning-based Formation Detection and GNN-driven Tactical Decision Support System for Football Analytics
 
 This repository contains the full implementation of my **Master’s Thesis** project, which presents an end-to-end AI-driven football analytics framework.  
-The system integrates **computer vision**, **machine learning**, and **graph neural networks (GNNs)** to analyze team formations, tactical phases, and recommend counter-formations using synchronized **tracking** and **event** data.
+The system integrates **machine learning**, and **graph neural networks (GNNs)** to analyze team formations, tactical phases, and recommend counter-formations using synchronized **tracking** and **event** data.
 
 ---
 

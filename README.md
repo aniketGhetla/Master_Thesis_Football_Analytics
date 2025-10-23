@@ -30,7 +30,7 @@ Data ingestion and synchronization are handled using:
 
 
 ## 🧠 System Overview
-The complete pipeline from data ingestion to recommendation is shown below:
+The complete pipeline from data ingestion to dashboard is shown below:
 
 ![System Architecture](Images/architecture.png)
 
@@ -56,6 +56,8 @@ The complete pipeline from data ingestion to recommendation is shown below:
 - Output stored in DB columns: `phase_home_pred`, `phase_away_pred`.
 
 **Tools:** `PyTorch`, `Torchvision`, `Streamlit`, `NumPy`, `Pandas`
+
+![Phase of Play labelling tool](Images/PHPlabellingtool.png)
 
 ---
 
